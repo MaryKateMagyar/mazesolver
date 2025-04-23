@@ -10,7 +10,7 @@ class Window:
         self.__root.geometry(f"{self.width}x{self.height}")
         self.__root.protocol("WM_DELETE_WINDOW", self.close)
 
-        self.canvas = Canvas()
+        self.canvas = Canvas(self.__root, height=self.height, width=self.width)
         self.canvas.pack()
 
         self.running = False
@@ -27,6 +27,9 @@ class Window:
     def close(self):
         self.running = False
 
+    def draw_line(self, line, fill_color):
+        line.draw(self.canvas, fill_color)
+
 class Point:
     def __init__(self, x, y):
         self.x = x  # the x-coordinate (horizontal) in pixels of the point
@@ -36,10 +39,29 @@ class Point:
 
 class Line:
     def __init__(self, point1, point2):
-        
+        self.point1_x = point1.x
+        self.point1_y = point1.y
+        self.point2_x = point2.x
+        self.point2_y = point2.y
+
+    def draw(self, canvas, fill_color):
+        canvas.create_line(
+            self.point1_x, self.point1_y, self.point2_x, self.point2_y, 
+            fill=fill_color, width=2
+        )
+
+
 
 def main():
     win = Window(800, 600)
+    point1 = Point(100, 5)
+    point2 = Point(1000, 86)
+    point3 = Point(12, 890)
+    point4 = Point(930, 322)
+    line1 = Line(point1, point2)
+    line2 = Line(point3, point1)
+    win.draw_line(line1, "red")
+    win.draw_line(line2, "black")
     win.wait_for_close()
 
 main()

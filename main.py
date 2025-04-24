@@ -51,12 +51,19 @@ class Line:
         )
 
 class Cell:
-    def __init__(self, window, point1, point2, has_left_wall=True, has_right_wall=True, has_bottom_wall=True, has_top_wall=True):
+    def __init__(
+            self, window, point1, point2, 
+            has_left_wall=True, has_right_wall=True, 
+            has_bottom_wall=True, has_top_wall=True
+        ):
         self._win = window
         self._x1 = point1.x
         self._y1 = point1.y
         self._x2 = point2.x
         self._y2 = point2.y
+
+        self.center_x = self._x1 + ((self._x2 - self._x1) / 2)
+        self.center_y = self._y1 + ((self._y2 - self._y1) / 2)
 
         self.has_left_wall = has_left_wall
         self.has_right_wall = has_right_wall
@@ -76,8 +83,22 @@ class Cell:
         if self.has_bottom_wall:
             bottom_wall = Line(Point(self._x1, self._y2), Point(self._x2, self._y2))
             self._win.draw_line(bottom_wall)
+    
+    def draw_move(self, to_cell, undo=False):
+        point1 = Point(self.center_x, self.center_y)
+        point2 = Point(to_cell.center_x, to_cell.center_y)
+        path = Line(point1, point2)
+        if undo is False:
+            self._win.draw_line(path, "red")
+        else: 
+            self._win.draw_line(path, "gray")
 
-
+class Maze:
+    def __init__(
+        self, win, x1, y1, 
+        num_rows, num_cols,
+        cell_size_x, cell_size_y
+    ):
 
 
 def main():
@@ -90,6 +111,7 @@ def main():
     point4 = Point(100, 100)
     cell2 = Cell(win, point3, point4, has_right_wall=False)
     cell2.draw()
+    cell1.draw_move(cell2)
     win.wait_for_close()
 
 main()

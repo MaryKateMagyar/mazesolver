@@ -1,4 +1,5 @@
 from tkinter import Tk, BOTH, Canvas
+import time
 
 class Window:
     def __init__(self, width, height):
@@ -99,19 +100,41 @@ class Maze:
         num_rows, num_cols,
         cell_size_x, cell_size_y
     ):
+        self.win = win
+        self.x1 = x1
+        self.y1 = y1
+        self.num_rows = num_rows
+        self.num_cols = num_cols
+        self.cell_size_x = cell_size_x
+        self.cell_size_y = cell_size_y
+        
+        self._create_cells()
+    
+    def _create_cells(self):
+        self._cells = []
+        for i in range(self.num_cols):
+            column = []
+            self._cells.append(column)
+            for j in range(self.num_rows):
+                _x1 = self.x1 + (i * self.cell_size_x)
+                _x2 = _x1 + self.cell_size_x
+                _y1 = self.y1 + (j * self.cell_size_y)
+                _y2 = _y1 + self.cell_size_y
+                column.append(Cell(self.win, Point(_x1, _y1), Point(_x2, _y2)))
+                self._draw_cell(i, j)
+
+    def _draw_cell(self, i, j):
+        self._cells[i][j].draw()
+        self._animate()
+
+    def _animate(self):
+        self.win.redraw()
+        time.sleep(0.05)
 
 
 def main():
     win = Window(800, 600)
-    point1 = Point(10, 10)
-    point2 = Point(30, 30)
-    cell1 = Cell(win, point1, point2)
-    cell1.draw()
-    point3 = Point(50, 50)
-    point4 = Point(100, 100)
-    cell2 = Cell(win, point3, point4, has_right_wall=False)
-    cell2.draw()
-    cell1.draw_move(cell2)
+    maze = Maze(win, 0, 0, 10, 10, 25, 25)
     win.wait_for_close()
 
 main()

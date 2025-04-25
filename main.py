@@ -53,7 +53,7 @@ class Line:
 
 class Cell:
     def __init__(
-            self, window, point1, point2, 
+            self, point1, point2, window=None,
             has_left_wall=True, has_right_wall=True, 
             has_bottom_wall=True, has_top_wall=True
         ):
@@ -72,18 +72,19 @@ class Cell:
         self.has_bottom_wall = has_bottom_wall
 
     def draw(self):
-        if self.has_left_wall:
-            left_wall = Line(Point(self._x1, self._y1), Point(self._x1, self._y2))
-            self._win.draw_line(left_wall)
-        if self.has_top_wall:
-            top_wall = Line(Point(self._x1, self._y1), Point(self._x2, self._y1))
-            self._win.draw_line(top_wall)
-        if self.has_right_wall:
-            right_wall = Line(Point(self._x2, self._y1), Point(self._x2, self._y2))
-            self._win.draw_line(right_wall)
-        if self.has_bottom_wall:
-            bottom_wall = Line(Point(self._x1, self._y2), Point(self._x2, self._y2))
-            self._win.draw_line(bottom_wall)
+        if self._win:
+            if self.has_left_wall:
+                left_wall = Line(Point(self._x1, self._y1), Point(self._x1, self._y2))
+                self._win.draw_line(left_wall)
+            if self.has_top_wall:
+                top_wall = Line(Point(self._x1, self._y1), Point(self._x2, self._y1))
+                self._win.draw_line(top_wall)
+            if self.has_right_wall:
+                right_wall = Line(Point(self._x2, self._y1), Point(self._x2, self._y2))
+                self._win.draw_line(right_wall)
+            if self.has_bottom_wall:
+                bottom_wall = Line(Point(self._x1, self._y2), Point(self._x2, self._y2))
+                self._win.draw_line(bottom_wall)
     
     def draw_move(self, to_cell, undo=False):
         point1 = Point(self.center_x, self.center_y)
@@ -96,9 +97,9 @@ class Cell:
 
 class Maze:
     def __init__(
-        self, win, x1, y1, 
+        self, x1, y1, 
         num_rows, num_cols,
-        cell_size_x, cell_size_y
+        cell_size_x, cell_size_y, win=None
     ):
         self.win = win
         self.x1 = x1
@@ -120,8 +121,9 @@ class Maze:
                 _x2 = _x1 + self.cell_size_x
                 _y1 = self.y1 + (j * self.cell_size_y)
                 _y2 = _y1 + self.cell_size_y
-                column.append(Cell(self.win, Point(_x1, _y1), Point(_x2, _y2)))
-                self._draw_cell(i, j)
+                column.append(Cell(Point(_x1, _y1), Point(_x2, _y2), self.win))
+                if self.win:
+                    self._draw_cell(i, j)
 
     def _draw_cell(self, i, j):
         self._cells[i][j].draw()
@@ -134,7 +136,8 @@ class Maze:
 
 def main():
     win = Window(800, 600)
-    maze = Maze(win, 0, 0, 10, 10, 25, 25)
+    maze = Maze(0, 0, 10, 10, 25, 25, win)
     win.wait_for_close()
 
-main()
+if __name__ == "__main__":
+    main()

@@ -173,7 +173,6 @@ class Maze:
             if j > 0:
                 adjactent.append((self._cells[i][j-1], (i, j-1), "has_top_wall", "has_bottom_wall"))
             if j < self.num_rows - 1:
-                bottom = self._cells[i][j + 1]
                 adjactent.append((self._cells[i][j+1], (i, j+1), "has_bottom_wall", "has_top_wall"))
             
             for direction in adjactent:
@@ -194,6 +193,43 @@ class Maze:
         for i in range(self.num_cols):
             for j in range(self.num_rows):
                 setattr(self._cells[i][j], "visited", False)
+
+    def solve(self):
+        return self._solve_r()
+
+    def _solve_r(self, i=0, j=0):
+        self._animate()
+        current = self._cells[i][j]
+        end = self._cells[-1][-1]
+        current.visited = True
+
+        if current == end:
+            return True
+
+        directions = []
+
+        if i > 0:
+            left = (self._cells[i-1][j], (i-1, j), current.has_left_wall, self._cells[i-1][j].visited)
+            directions.append(left)
+        if i < self.num_cols - 1:
+            right = (self._cells[i+1][j], (i+1, j), current.has_right_wall, self._cells[i+1][j].visited)
+            directions.append(right)
+        if j > 0:
+            top = (self._cells[i][j-1], (i, j-1), current.has_top_wall, self._cells[i][j-1].visited)
+            directions.append(top)
+        if j < self.num_rows - 1:
+            bottom = (self._cells[i][j+1], (i, j+1), current.has_bottom_wall, self._cells[i][j+1].visited)
+            directions.append(bottom)
+
+        for direction in directions:
+            if direction[2] == False and direction[3] == False:
+                current.draw_move(direction[0])
+                if self._solve_r(*direction[1]) == True:
+                    return True
+                current.draw_move(direction[0], undo=True)
+        return False
+
+
             
 
 
@@ -202,9 +238,13 @@ class Maze:
 def main():
     win = Window(800, 600)
     maze = Maze(5, 5, 10, 10, 25, 25, win, 10)
-    maze2 = Maze(300, 5, 10, 10, 25, 25, win, 10)
+    maze2 = Maze(300, 5, 10, 10, 25, 25, win)
     maze3 = Maze(5, 300, 10, 10, 25, 25, win)
     maze4 = Maze(300, 300, 10, 10, 25, 25, win)
+    maze.solve()
+    maze2.solve()
+    maze3.solve()
+    maze4.solve()
     win.wait_for_close()
 
 if __name__ == "__main__":
